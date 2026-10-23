@@ -1,0 +1,490 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChurnIQ | Analytics Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fc;
+            color: #172554;
+        }
+
+        header {
+            background: linear-gradient(135deg, #101d45, #2456a6);
+            color: white;
+            padding: 25px 6%;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+        }
+
+        header p {
+            margin: 0;
+            color: #dbeafe;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .top-row h2 {
+            margin: 0;
+        }
+
+        .back-link {
+            background: #2456a6;
+            color: white;
+            padding: 11px 17px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            background: #173d7a;
+        }
+
+        /* Customer summary cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        /* Model evaluation cards */
+        .model-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 23px;
+            border-radius: 14px;
+            box-shadow: 0 5px 20px rgba(20, 40, 80, 0.06);
+            min-width: 0;
+        }
+
+        .kpi-label {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .kpi-value {
+            font-size: 30px;
+            font-weight: bold;
+            color: #173d7a;
+            margin: 8px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .metric-description {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
+
+        .model-metrics-grid h3 {
+            font-size: 16px;
+            margin: 0;
+            color: #334155;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .chart-card h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .chart-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        .insight {
+            margin-top: 24px;
+            background: #e8f0ff;
+            border-left: 5px solid #2456a6;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+
+        .insight p {
+            margin-bottom: 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 1000px) {
+            .model-metrics-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 850px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .model-metrics-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-grid,
+            .model-metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-value {
+                font-size: 26px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>ChurnIQ</h1>
+    <p>Customer Retention Intelligence Platform</p>
+</header>
+
+<main class="container">
+
+    <div class="top-row">
+        <div>
+            <h2>Analytics Dashboard</h2>
+            <p>Explore customer retention patterns and churn trends.</p>
+        </div>
+
+        <a class="back-link" href="/">← Back to Prediction</a>
+    </div>
+
+    <!-- Customer summary cards -->
+    <section class="kpi-grid">
+
+        <div class="card">
+            <div class="kpi-label">Total Customers</div>
+            <div class="kpi-value">{{ "{:,}".format(total_customers) }}</div>
+        </div>
+
+        <div class="card">
+            <div class="kpi-label">Churned Customers</div>
+            <div class="kpi-value">{{ "{:,}".format(churned) }}</div>
+        </div>
+
+        <div class="card">
+            <div class="kpi-label">Retained Customers</div>
+            <div class="kpi-value">{{ "{:,}".format(retained) }}</div>
+        </div>
+
+        <div class="card">
+            <div class="kpi-label">Overall Churn Rate</div>
+            <div class="kpi-value">{{ churn_rate }}%</div>
+        </div>
+
+    </section>
+
+    <!-- Model evaluation cards -->
+    <section class="model-metrics-grid">
+
+        <div class="card">
+            <h3>Model Accuracy</h3>
+            <div class="kpi-value">
+                {{ (model_metrics.accuracy * 100) | round(2) }}%
+            </div>
+            <p class="metric-description">
+                Overall prediction correctness.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Precision</h3>
+            <div class="kpi-value">
+                {{ (model_metrics.precision * 100) | round(2) }}%
+            </div>
+            <p class="metric-description">
+                How often predicted churners actually churned.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Recall</h3>
+            <div class="kpi-value">
+                {{ (model_metrics.recall * 100) | round(2) }}%
+            </div>
+            <p class="metric-description">
+                Actual churners identified by the model.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>F1-Score</h3>
+            <div class="kpi-value">
+                {{ (model_metrics.f1_score * 100) | round(2) }}%
+            </div>
+            <p class="metric-description">
+                Balance between precision and recall.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>ROC-AUC</h3>
+            <div class="kpi-value">
+                {{ (model_metrics.roc_auc * 100) | round(2) }}%
+            </div>
+            <p class="metric-description">
+                Ability to distinguish churners from non-churners.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- Existing three charts -->
+    <section class="charts-grid">
+
+        <div class="card chart-card">
+            <h3>Churn by Contract Type</h3>
+            <p>
+                Percentage of customers who churn within each contract group.
+            </p>
+
+            <div class="chart-container">
+                <canvas id="contractChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h3>Churn by Customer Tenure</h3>
+            <p>
+                How churn rates vary with the length of the customer relationship.
+            </p>
+
+            <div class="chart-container">
+                <canvas id="tenureChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h3>Top Churn Factors</h3>
+            <p>
+                Features with the largest model coefficients.
+                Positive values are associated with higher churn odds;
+                negative values with lower odds.
+            </p>
+
+            <div class="chart-container">
+                <canvas id="featureChart"></canvas>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Business insight -->
+    <div class="insight">
+        <strong>Business Insight</strong>
+        <p>
+            Customers on month-to-month contracts and customers with shorter
+            tenures may need additional retention attention. Businesses can
+            investigate these groups and test suitable retention offers.
+            These patterns show associations, not proof of causation.
+        </p>
+    </div>
+
+</main>
+
+<footer>
+    ChurnIQ | Customer Retention Intelligence Platform
+</footer>
+
+<script>
+    // Contract chart data
+    const contractLabels = {{ contract_labels | tojson }};
+    const contractRates = {{ contract_rates | tojson }};
+
+    // Tenure chart data
+    const tenureLabels = {{ tenure_labels | tojson }};
+    const tenureRates = {{ tenure_rates | tojson }};
+
+    // Chart 1: Churn by contract type
+    new Chart(document.getElementById("contractChart"), {
+        type: "bar",
+        data: {
+            labels: contractLabels,
+            datasets: [{
+                label: "Churn Rate (%)",
+                data: contractRates,
+                backgroundColor: ["#5279d5", "#4eaa94", "#e9a23b"],
+                borderRadius: 7,
+                maxBarThickness: 75
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: "Churn Rate (%)"
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + "% churn";
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Chart 2: Churn by customer tenure
+    new Chart(document.getElementById("tenureChart"), {
+        type: "line",
+        data: {
+            labels: tenureLabels,
+            datasets: [{
+                label: "Churn Rate (%)",
+                data: tenureRates,
+                borderColor: "#2456a6",
+                backgroundColor: "rgba(36, 86, 166, 0.12)",
+                fill: true,
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: "Churn Rate (%)"
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + "% churn";
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Feature coefficient chart data
+    const featureLabels = {{ feature_labels | tojson }};
+    const featureValues = {{ feature_values | tojson }};
+
+    // Chart 3: Top churn factors
+    new Chart(document.getElementById("featureChart"), {
+        type: "bar",
+        data: {
+            labels: featureLabels,
+            datasets: [{
+                label: "Model Coefficient",
+                data: featureValues,
+                backgroundColor: featureValues.map(
+                    value => value >= 0 ? "#e9a23b" : "#5279d5"
+                ),
+                borderRadius: 5
+            }]
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Model Coefficient"
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

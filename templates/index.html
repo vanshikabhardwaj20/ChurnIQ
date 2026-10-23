@@ -1,0 +1,416 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChurnIQ | Customer Retention Intelligence</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fc;
+            color: #1e293b;
+        }
+
+        header {
+            background: #102a43;
+            color: white;
+            padding: 24px 7%;
+        }
+
+        header h1 {
+            margin: 0 0 7px;
+            font-size: 30px;
+        }
+
+        header p {
+            margin: 0;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .intro {
+            margin-bottom: 24px;
+        }
+
+        .intro h2 {
+            margin-bottom: 8px;
+        }
+
+        .intro p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .panel {
+            background: white;
+            padding: 26px;
+            border-radius: 14px;
+            box-shadow: 0 5px 22px rgba(15, 23, 42, 0.06);
+            margin-bottom: 24px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        .section-title {
+            grid-column: 1 / -1;
+            margin: 12px 0 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #2563eb;
+        }
+
+        .submit-button {
+            margin-top: 24px;
+            width: 100%;
+            border: 0;
+            border-radius: 8px;
+            padding: 14px;
+            color: white;
+            background: #2563eb;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+        }
+
+        .result h2 {
+            margin-top: 0;
+        }
+
+        .result-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1d4ed8;
+            margin: 10px 0;
+        }
+
+        .risk {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .result li {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .error {
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            padding: 24px;
+        }
+
+        @media (max-width: 650px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                grid-column: 1;
+            }
+
+            header h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    
+<header>
+    <h1>ChurnIQ | Customer Retention Intelligence Platform</h1>
+    <p>Predict customer churn and discover retention insights.</p>
+
+    <a href="/dashboard" style="display:inline-block; margin-top:15px; padding:10px 16px; background:#ffffff; color:#173d7a; border-radius:8px; text-decoration:none; font-weight:bold;">
+        View Analytics Dashboard →
+    </a>
+</header>
+
+
+    <main>
+        <section class="intro">
+            <h2>Customer Churn Analysis</h2>
+            <p>
+                Enter a customer's service and billing details to estimate
+                their likelihood of leaving. Use the result as a decision-support
+                signal, not a guarantee of future behaviour.
+            </p>
+        </section>
+
+        {% if error %}
+        <div class="panel error">{{ error }}</div>
+        {% endif %}
+
+        <section class="panel">
+            <h2>Customer Details</h2>
+
+            <form action="/predict" method="POST">
+                <div class="form-grid">
+
+                    <h3 class="section-title">Customer Profile</h3>
+
+                    <div class="field">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="SeniorCitizen">Senior Citizen</label>
+                        <select id="SeniorCitizen" name="SeniorCitizen" required>
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="Partner">Has Partner?</label>
+                        <select id="Partner" name="Partner" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="Dependents">Has Dependents?</label>
+                        <select id="Dependents" name="Dependents" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="tenure">Tenure (months, 0–72)</label>
+                        <input id="tenure" name="tenure" type="number"
+                               min="0" max="72" value="12" required>
+                    </div>
+
+                    <h3 class="section-title">Services</h3>
+
+                    <div class="field">
+                        <label for="PhoneService">Phone Service</label>
+                        <select id="PhoneService" name="PhoneService" required>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="MultipleLines">Multiple Lines</label>
+                        <select id="MultipleLines" name="MultipleLines" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No phone service">No phone service</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="InternetService">Internet Service</label>
+                        <select id="InternetService" name="InternetService" required>
+                            <option value="DSL">DSL</option>
+                            <option value="Fiber optic">Fiber optic</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="OnlineSecurity">Online Security</label>
+                        <select id="OnlineSecurity" name="OnlineSecurity" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">No internet service</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="OnlineBackup">Online Backup</label>
+                        <select id="OnlineBackup" name="OnlineBackup" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">No internet service</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="DeviceProtection">Device Protection</label>
+                        <select id="DeviceProtection" name="DeviceProtection" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">No internet service</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="TechSupport">Tech Support</label>
+                        <select id="TechSupport" name="TechSupport" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">No internet service</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="StreamingTV">Streaming TV</label>
+                        <select id="StreamingTV" name="StreamingTV" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">No internet service</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="StreamingMovies">Streaming Movies</label>
+                        <select id="StreamingMovies" name="StreamingMovies" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No internet service">No internet service</option>
+                        </select>
+                    </div>
+
+                    <h3 class="section-title">Contract and Billing</h3>
+
+                    <div class="field">
+                        <label for="Contract">Contract Type</label>
+                        <select id="Contract" name="Contract" required>
+                            <option value="Month-to-month">Month-to-month</option>
+                            <option value="One year">One year</option>
+                            <option value="Two year">Two year</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="PaperlessBilling">Paperless Billing</label>
+                        <select id="PaperlessBilling" name="PaperlessBilling" required>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="PaymentMethod">Payment Method</label>
+                        <select id="PaymentMethod" name="PaymentMethod" required>
+                            <option value="Electronic check">Electronic check</option>
+                            <option value="Mailed check">Mailed check</option>
+                            <option value="Bank transfer (automatic)">Bank transfer (automatic)</option>
+                            <option value="Credit card (automatic)">Credit card (automatic)</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="MonthlyCharges">Monthly Charges ($)</label>
+                        <input id="MonthlyCharges" name="MonthlyCharges"
+                               type="number" min="0" step="0.01"
+                               value="70" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="TotalCharges">Total Charges ($)</label>
+                        <input id="TotalCharges" name="TotalCharges"
+                               type="number" min="0" step="0.01"
+                               value="840" required>
+                    </div>
+
+                </div>
+
+                <button class="submit-button" type="submit">
+                    Analyse Churn Risk
+                </button>
+            </form>
+        </section>
+
+        {% if prediction %}
+        <section class="panel result">
+            <h2>Prediction Results</h2>
+            <p>Model assessment: <strong>{{ prediction }}</strong></p>
+            <div class="result-number">{{ churn_percent }}%</div>
+            <p>Estimated churn probability</p>
+            <p>Risk category: <span class="risk">{{ risk }}</span></p>
+
+            <h3>Suggested Retention Actions</h3>
+            <ul>
+                {% for item in recommendations %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+
+            <p>
+                This is a model estimate, not a certainty. Review the customer's
+                circumstances before deciding on an action.
+            </p>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer>
+        ChurnIQ · Machine-learning-assisted customer retention analysis
+    </footer>
+</body>
+</html>

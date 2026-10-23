@@ -1,0 +1,46 @@
+Feature,Coefficient,AbsoluteImportance,Direction
+numeric__tenure,-1.2503739536563483,1.2503739536563483,Associated with lower churn odds
+categorical__Contract_Two year,-0.7777010407248773,0.7777010407248773,Associated with lower churn odds
+categorical__Contract_Month-to-month,0.6960664607850257,0.6960664607850257,Associated with higher churn odds
+categorical__InternetService_Fiber optic,0.6609059140132293,0.6609059140132293,Associated with higher churn odds
+numeric__MonthlyCharges,-0.6211372180551408,0.6211372180551408,Associated with lower churn odds
+numeric__TotalCharges,0.6074328366753569,0.6074328366753569,Associated with higher churn odds
+categorical__InternetService_DSL,-0.5888339708265647,0.5888339708265647,Associated with lower churn odds
+categorical__TechSupport_No internet service,-0.2569017544580854,0.2569017544580854,Associated with lower churn odds
+categorical__DeviceProtection_No internet service,-0.2569017544580854,0.2569017544580854,Associated with lower churn odds
+categorical__InternetService_No,-0.2569017544580854,0.2569017544580854,Associated with lower churn odds
+categorical__OnlineSecurity_No internet service,-0.2569017544580854,0.2569017544580854,Associated with lower churn odds
+categorical__StreamingMovies_No internet service,-0.2569017544580854,0.2569017544580854,Associated with lower churn odds
+categorical__StreamingTV_No internet service,-0.2569017544580854,0.2569017544580854,Associated with lower churn odds
+categorical__OnlineBackup_No internet service,-0.2569017544580854,0.2569017544580854,Associated with lower churn odds
+categorical__StreamingTV_Yes,0.25208088022477215,0.25208088022477215,Associated with higher churn odds
+categorical__StreamingMovies_Yes,0.24473201864746202,0.24473201864746202,Associated with higher churn odds
+categorical__MultipleLines_No,-0.2368242557751496,0.2368242557751496,Associated with lower churn odds
+categorical__PaymentMethod_Electronic check,0.2290961843778257,0.2290961843778257,Associated with higher churn odds
+categorical__PaperlessBilling_No,-0.21909105854353325,0.21909105854353325,Associated with lower churn odds
+categorical__Dependents_Yes,-0.2057603887266736,0.2057603887266736,Associated with lower churn odds
+categorical__OnlineSecurity_No,0.19937094316880433,0.19937094316880433,Associated with higher churn odds
+categorical__PaymentMethod_Bank transfer (automatic),-0.18121112115852195,0.18121112115852195,Associated with lower churn odds
+categorical__StreamingTV_No,-0.18000893703809576,0.18000893703809576,Associated with lower churn odds
+categorical__TechSupport_No,0.1768529814614834,0.1768529814614834,Associated with higher churn odds
+categorical__StreamingMovies_No,-0.17266007546079457,0.17266007546079457,Associated with lower churn odds
+categorical__OnlineSecurity_Yes,-0.12729899998213534,0.12729899998213534,Associated with lower churn odds
+categorical__PaymentMethod_Mailed check,-0.12327265348265554,0.12327265348265554,Associated with lower churn odds
+categorical__MultipleLines_Yes,0.12275020641078123,0.12275020641078123,Associated with higher churn odds
+categorical__PhoneService_Yes,-0.11407404936436565,0.11407404936436565,Associated with lower churn odds
+categorical__Partner_Yes,-0.1126023893592701,0.1126023893592701,Associated with lower churn odds
+categorical__PaymentMethod_Credit card (automatic),-0.10944222100807156,0.10944222100807156,Associated with lower churn odds
+categorical__TechSupport_Yes,-0.10478103827481935,0.10478103827481935,Associated with lower churn odds
+categorical__Contract_One year,-0.10319523133156562,0.10319523133156562,Associated with lower churn odds
+categorical__gender_Male,-0.09847045925429354,0.09847045925429354,Associated with lower churn odds
+categorical__gender_Female,-0.08635935201712236,0.08635935201712236,Associated with lower churn odds
+categorical__DeviceProtection_Yes,0.08331467514356976,0.08331467514356976,Associated with higher churn odds
+categorical__OnlineBackup_No,0.07985646978274359,0.07985646978274359,Associated with higher churn odds
+numeric__SeniorCitizen,0.07572688260199911,0.07572688260199911,Associated with higher churn odds
+categorical__Partner_No,-0.07222742191214085,0.07222742191214085,Associated with lower churn odds
+categorical__MultipleLines_No phone service,-0.07075576190704586,0.07075576190704586,Associated with lower churn odds
+categorical__PhoneService_No,-0.07075576190704586,0.07075576190704586,Associated with lower churn odds
+categorical__PaperlessBilling_Yes,0.034261247272105076,0.034261247272105076,Associated with higher churn odds
+categorical__Dependents_No,0.02093057745526111,0.02093057745526111,Associated with higher churn odds
+categorical__DeviceProtection_No,-0.011242731956893605,0.011242731956893605,Associated with lower churn odds
+categorical__OnlineBackup_Yes,-0.00778452659607722,0.00778452659607722,Associated with lower churn odds
