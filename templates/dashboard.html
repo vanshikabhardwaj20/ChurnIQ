@@ -36,7 +36,6 @@
         }
 
         button, a { font: inherit; }
-
         .app { display: flex; min-height: 100vh; }
 
         .sidebar {
@@ -385,6 +384,16 @@
 
         .chart-wrap { height: 270px; position: relative; }
 
+        .comparison-note {
+            margin-top: 15px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            background: #f5f7ff;
+            color: #596682;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
         .insights-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -503,9 +512,7 @@
             </div>
 
             <div class="topbar-right">
-                <a class="back-button" href="{{ url_for('home') }}">
-                    ← Back to Customer Form
-                </a>
+                <a class="back-button" href="{{ url_for('home') }}">← Back to Customer Form</a>
                 <div class="live-pill"><span class="status-dot"></span> Analytics ready</div>
                 <div class="avatar">C</div>
             </div>
@@ -589,6 +596,32 @@
                     </article>
                     {% endfor %}
                 </div>
+
+                <!-- NEW: model comparison chart -->
+                <div class="charts-grid">
+                    <article class="panel wide">
+                        <div class="panel-header">
+                            <div>
+                                <h3 class="panel-title">Logistic Regression vs Random Forest</h3>
+                                <div class="panel-subtitle">
+                                    Compare six classification metrics on the same held-out test set.
+                                </div>
+                            </div>
+                            <span class="panel-tag">MODEL COMPARISON</span>
+                        </div>
+
+                        <div class="chart-wrap">
+                            <canvas id="modelComparisonChart"></canvas>
+                        </div>
+
+                        <div class="comparison-note">
+                            <strong>How to interpret:</strong>
+                            Logistic Regression has higher recall in this evaluation, meaning it detects more of the customers who churned.
+                            Random Forest has higher accuracy, precision and specificity, meaning it makes fewer false-positive predictions.
+                            The appropriate choice depends on the cost of missed churners versus unnecessary retention outreach.
+                        </div>
+                    </article>
+                </div>
             </section>
 
             <section id="churn-analysis">
@@ -624,7 +657,7 @@
                         <div class="panel-header">
                             <div>
                                 <h3 class="panel-title">Factors influencing churn predictions</h3>
-                                <div class="panel-subtitle">Logistic regression coefficients show the direction of each model effect.</div>
+                                <div class="panel-subtitle">Logistic regression coefficients show the direction and strength of model effects on the log-odds scale.</div>
                             </div>
                             <span class="panel-tag">MODEL EXPLAINABILITY</span>
                         </div>
@@ -680,7 +713,62 @@
     const factorLabels = {{ factor_labels | tojson }};
     const factorValues = {{ factor_values | tojson }};
 
+    // Data prepared by app.py from models/model_comparison.csv
+    const comparisonLabels = {{ comparison_labels | tojson }};
+    const comparisonData = {{ comparison_data | tojson }};
+    const comparisonMetrics = {{ comparison_metrics | tojson }};
+
     const gridColor = "#edf0f6";
+
+    // Model comparison chart
+    new Chart(document.getElementById("modelComparisonChart"), {
+        type: "bar",
+        data: {
+            labels: comparisonMetrics,
+            datasets: comparisonLabels.map((modelName, index) => ({
+                label: modelName,
+                data: comparisonMetrics.map(
+                    metric => comparisonData[metric][index] * 100
+                ),
+                backgroundColor: index === 0 ? "#627cff" : "#9673ff",
+                borderRadius: 5,
+                maxBarThickness: 30
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+            plugins: {
+                legend: { position: "bottom" },
+                tooltip: {
+                    callbacks: {
+                        label: context =>
+                            context.dataset.label + ": " +
+                            Number(context.raw).toFixed(2) + "%"
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    border: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: gridColor },
+                    border: { display: false },
+                    ticks: {
+                        callback: value => value + "%"
+                    }
+                }
+            }
+        }
+    });
 
     new Chart(document.getElementById("contractChart"), {
         type: "bar",
@@ -750,7 +838,9 @@
             datasets: [{
                 label: "Model coefficient",
                 data: factorValues,
-                backgroundColor: factorValues.map(v => v >= 0 ? "#ed8197" : "#6684ff"),
+                backgroundColor: factorValues.map(
+                    value => value >= 0 ? "#ed8197" : "#6684ff"
+                ),
                 borderRadius: 5,
                 maxBarThickness: 24
             }]
@@ -763,13 +853,20 @@
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: context => "Coefficient: " + Number(context.raw).toFixed(3)
+                        label: context =>
+                            "Coefficient: " + Number(context.raw).toFixed(3)
                     }
                 }
             },
             scales: {
-                x: { grid: { color: gridColor }, border: { display: false } },
-                y: { grid: { display: false }, border: { display: false } }
+                x: {
+                    grid: { color: gridColor },
+                    border: { display: false }
+                },
+                y: {
+                    grid: { display: false },
+                    border: { display: false }
+                }
             }
         }
     });

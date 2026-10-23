@@ -8,8 +8,15 @@ import math
 
 app = Flask(__name__)
 
+# Project paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "churn_model.joblib")
+DATA_PATH = os.path.join(BASE_DIR, "data", "Telco-Customer-Churn.csv")
+IMPORTANCE_PATH = os.path.join(BASE_DIR, "models", "feature_importance.csv")
+METRICS_PATH = os.path.join(BASE_DIR, "models", "model_metrics.json")
+COMPARISON_PATH = os.path.join(BASE_DIR, "models", "model_comparison.csv")
+
 # Load the trained machine-learning model
-MODEL_PATH = os.path.join("models", "churn_model.joblib")
 model = joblib.load(MODEL_PATH)
 
 
@@ -155,7 +162,7 @@ def predict():
 @app.route("/dashboard")
 def analytics_dashboard():
     # 1. Load and clean dataset
-    df = pd.read_csv("data/Telco-Customer-Churn.csv")
+    df = pd.read_csv(DATA_PATH)
 
     df["TotalCharges"] = pd.to_numeric(
         df["TotalCharges"], errors="coerce"
@@ -196,11 +203,8 @@ def analytics_dashboard():
         .apply(lambda x: round((x == "Yes").mean() * 100, 2))
     )
 
-    # 5. Load and prepare feature importance
-    importance_path = os.path.join(
-        "models", "feature_importance.csv"
-    )
-    importance_df = pd.read_csv(importance_path)
+    # 5. Load and prepare feature coefficients
+    importance_df = pd.read_csv(IMPORTANCE_PATH)
 
     importance_df["AbsoluteCoefficient"] = (
         importance_df["Coefficient"].abs()
@@ -224,15 +228,53 @@ def analytics_dashboard():
     feature_labels = top_features["Feature"].tolist()
     feature_values = top_features["Coefficient"].round(3).tolist()
 
-    # 6. Load model evaluation metrics
-    metrics_path = os.path.join(
-        "models", "model_metrics.json"
-    )
-
-    with open(metrics_path, "r", encoding="utf-8") as file:
+    # 6. Load current production-model evaluation metrics
+    with open(METRICS_PATH, "r", encoding="utf-8") as file:
         model_metrics = json.load(file)
 
-    # 7. Pass chart data using the names expected by dashboard.html
+    # 7. Load model comparison data
+    comparison_df = pd.read_csv(COMPARISON_PATH)
+
+    required_columns = [
+        "Model",
+        "Accuracy",
+        "Precision",
+        "Recall",
+        "Specificity",
+        "F1 Score",
+        "ROC-AUC"
+    ]
+
+    missing_columns = [
+        column for column in required_columns
+        if column not in comparison_df.columns
+    ]
+
+    if missing_columns:
+        raise ValueError(
+            f"Missing columns in model_comparison.csv: {missing_columns}"
+        )
+
+    comparison_labels = comparison_df["Model"].tolist()
+
+    comparison_metrics = [
+        "Accuracy",
+        "Precision",
+        "Recall",
+        "Specificity",
+        "F1 Score",
+        "ROC-AUC"
+    ]
+
+    comparison_data = {
+        metric: [
+            round(float(value), 4)
+            for value in comparison_df[metric].tolist()
+        ]
+        for metric in comparison_metrics
+    }
+
+    # 8. Pass data to dashboard.html
     return render_template(
         "dashboard.html",
         total_customers=total_customers,
@@ -256,8 +298,13 @@ def analytics_dashboard():
         factor_labels=feature_labels,
         factor_values=feature_values,
 
-        # Model evaluation metrics
-        model_metrics=model_metrics
+        # Production-model metrics
+        model_metrics=model_metrics,
+
+        # Model comparison chart data
+        comparison_labels=comparison_labels,
+        comparison_metrics=comparison_metrics,
+        comparison_data=comparison_data
     )
 
 

@@ -275,12 +275,76 @@
             line-height: 1.6;
         }
 
-        .result-number {
-            font-size: 42px;
-            letter-spacing: -1px;
+        /* Churn probability gauge */
+        .gauge-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 22px auto 12px;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .gauge-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #34405e;
+            margin: 0 0 4px;
+        }
+
+        .gauge {
+            width: 100%;
+            max-width: 340px;
+            height: auto;
+            overflow: visible;
+        }
+
+        .gauge-track {
+            fill: none;
+            stroke: #e5eaf5;
+            stroke-width: 17;
+            stroke-linecap: round;
+        }
+
+        .gauge-progress {
+            fill: none;
+            stroke: #4263eb;
+            stroke-width: 17;
+            stroke-linecap: round;
+            stroke-dasharray: 267.035;
+            stroke-dashoffset: 267.035;
+            transition: stroke-dashoffset 1s ease, stroke .3s ease;
+        }
+
+        .gauge-percentage {
+            font-size: 32px;
             font-weight: 800;
-            color: #405ee8;
-            margin: 16px 0 3px;
+            fill: #202944;
+            text-anchor: middle;
+        }
+
+        .gauge-caption {
+            font-size: 11px;
+            fill: #73809b;
+            text-anchor: middle;
+        }
+
+        .gauge-scale {
+            display: flex;
+            justify-content: space-between;
+            width: 83%;
+            margin-top: -5px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .gauge-status {
+            margin-top: 16px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
         }
 
         .risk {
@@ -337,7 +401,11 @@
             .panel { padding: 19px; }
             .form-grid { grid-template-columns: 1fr; gap: 18px; }
             .section-title { grid-column: 1; }
-            .result-number { font-size: 36px; }
+            .gauge { max-width: 300px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .gauge-progress { transition: none; }
         }
     </style>
 </head>
@@ -578,8 +646,41 @@
             <span class="risk">{{ risk }} Risk</span>
         </div>
 
-        <div class="result-number">{{ churn_percent }}%</div>
-        <p class="result-description">Estimated probability of customer churn</p>
+        <!-- Gauge uses the real probability returned by Flask -->
+        <div class="gauge-section">
+            <p class="gauge-title">Customer Churn Probability</p>
+
+            <svg class="gauge"
+                 viewBox="0 0 220 135"
+                 role="img"
+                 aria-label="Customer churn probability: {{ churn_percent }} percent">
+
+                <path class="gauge-track"
+                      d="M 25 110 A 85 85 0 0 1 195 110" />
+
+                <path class="gauge-progress"
+                      id="churnGaugeProgress"
+                      d="M 25 110 A 85 85 0 0 1 195 110" />
+
+                <text class="gauge-percentage"
+                      x="110" y="88">{{ churn_percent }}%</text>
+
+                <text class="gauge-caption"
+                      x="110" y="107">CHURN PROBABILITY</text>
+            </svg>
+
+            <div class="gauge-scale" aria-hidden="true">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+            </div>
+
+            <div class="gauge-status"
+                 id="churnGaugeStatus"
+                 data-risk="{{ risk }}">
+                {{ risk }} Risk
+            </div>
+        </div>
 
         <h3>Suggested Retention Actions</h3>
         <ul>
@@ -603,5 +704,46 @@
 <footer>
     ChurnIQ &copy; 2026 &middot; Machine-learning-assisted customer retention analysis
 </footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const gauge = document.getElementById("churnGaugeProgress");
+    const status = document.getElementById("churnGaugeStatus");
+
+    // Only run on the page when prediction results are available.
+    if (!gauge || !status) {
+        return;
+    }
+
+    // Read the actual probability percentage rendered by Flask.
+    const percentageText = document.querySelector(".gauge-percentage").textContent;
+    const percentage = Math.max(
+        0,
+        Math.min(100, parseFloat(percentageText) || 0)
+    );
+
+    // The semicircular SVG arc has an approximate length of 267.035.
+    const arcLength = 267.035;
+    const remainingArc = arcLength * (1 - percentage / 100);
+
+    // Animate the gauge to the customer's predicted probability.
+    gauge.style.strokeDashoffset = remainingArc;
+
+    // Match the gauge colour to the project's risk thresholds.
+    if (percentage >= 70) {
+        gauge.style.stroke = "#dc4545";
+        status.style.background = "#fee2e2";
+        status.style.color = "#b42323";
+    } else if (percentage >= 40) {
+        gauge.style.stroke = "#e6a23c";
+        status.style.background = "#fff0cf";
+        status.style.color = "#915d08";
+    } else {
+        gauge.style.stroke = "#4263eb";
+        status.style.background = "#e9edff";
+        status.style.color = "#344fce";
+    }
+});
+</script>
 </body>
 </html>
