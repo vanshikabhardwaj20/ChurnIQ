@@ -4,487 +4,775 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChurnIQ | Analytics Dashboard</title>
+    <title>ChurnIQ | Customer Intelligence</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        * {
-            box-sizing: border-box;
+        :root {
+            --navy: #10172a;
+            --blue: #536dfe;
+            --purple: #8667f5;
+            --ink: #202942;
+            --muted: #8590a5;
+            --border: #e9edf4;
+            --background: #f5f7fb;
+            --green: #17a673;
+            --red: #ed647c;
+            --shadow: 0 8px 28px rgba(35, 48, 80, 0.045);
         }
+
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f3f6fc;
-            color: #172554;
+            background: var(--background);
+            color: var(--ink);
+            font-family: "DM Sans", sans-serif;
+            font-size: 14px;
         }
 
-        header {
-            background: linear-gradient(135deg, #101d45, #2456a6);
+        button, a { font: inherit; }
+
+        .app { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 248px;
+            flex-shrink: 0;
+            background: var(--navy);
             color: white;
-            padding: 25px 6%;
+            min-height: 100vh;
+            padding: 27px 17px;
+            display: flex;
+            flex-direction: column;
         }
 
-        header h1 {
-            margin: 0 0 8px;
-            font-size: 28px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0 10px 35px;
         }
 
-        header p {
+        .brand-mark {
+            height: 39px;
+            width: 39px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #7190ff, #8563ee);
+            display: grid;
+            place-items: center;
+            font-family: "Manrope", sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand-name {
+            font-family: "Manrope", sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -.7px;
+        }
+
+        .brand-name span { color: #8ea0ff; }
+
+        .nav-label {
+            padding: 0 12px;
+            margin: 0 0 12px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #74809d;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 12px 14px;
+            margin: 3px 0;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #aab5ce;
+            font-weight: 500;
+            transition: .2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: linear-gradient(110deg, #536dfe33, #8667f51c);
+            color: white;
+        }
+
+        .nav-link.active { box-shadow: inset 3px 0 #8194ff; }
+        .nav-icon { width: 20px; text-align: center; font-size: 17px; }
+        .sidebar-bottom { margin-top: auto; }
+
+        .model-status {
+            margin: 22px 3px 0;
+            padding: 15px;
+            border: 1px solid #34405c;
+            background: #19223a;
+            border-radius: 13px;
+        }
+
+        .status-heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #35d6a0;
+        }
+
+        .status-description {
+            color: #95a2bd;
+            font-size: 11px;
+            line-height: 1.7;
+            margin-top: 9px;
+        }
+
+        .main { min-width: 0; flex: 1; }
+
+        .topbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 19px 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .breadcrumb { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+        .breadcrumb span { color: var(--blue); font-weight: 600; }
+
+        .page-title {
+            font-family: "Manrope", sans-serif;
+            font-size: 23px;
+            font-weight: 800;
+            letter-spacing: -.8px;
             margin: 0;
-            color: #dbeafe;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 13px;
+            flex-wrap: wrap;
         }
 
-        .top-row {
+        .live-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #d9f3e8;
+            background: #f0fbf6;
+            color: #18855f;
+            border-radius: 30px;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            padding: 11px 15px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px #536dfe2b;
+            transition: background .2s, transform .2s;
+        }
+
+        .back-button:hover {
+            background: #4058e8;
+            transform: translateY(-1px);
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(135deg, #627cff, #9365ed);
+        }
+
+        .content { padding: 30px 34px 40px; max-width: 1600px; margin: auto; }
+
+        .welcome-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 22px;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
-        .top-row h2 {
+        .eyebrow {
+            color: var(--blue);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.6px;
+            margin-bottom: 9px;
+        }
+
+        .welcome-title {
+            font-family: "Manrope", sans-serif;
+            font-size: clamp(22px, 2.4vw, 30px);
+            letter-spacing: -1.2px;
+            font-weight: 800;
+            margin: 0 0 7px;
+        }
+
+        .welcome-subtitle { margin: 0; color: var(--muted); line-height: 1.7; }
+
+        .date-label {
+            white-space: nowrap;
+            color: #66718a;
+            font-size: 12px;
+            padding: 10px 13px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 10px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 29px 0 15px;
+        }
+
+        .section-heading h2 {
+            font-family: "Manrope", sans-serif;
+            font-size: 15px;
+            font-weight: 800;
             margin: 0;
         }
 
-        .back-link {
-            background: #2456a6;
-            color: white;
-            padding: 11px 17px;
-            border-radius: 8px;
-            text-decoration: none;
-        }
+        .section-note { font-size: 11px; color: var(--muted); }
 
-        .back-link:hover {
-            background: #173d7a;
-        }
-
-        /* Customer summary cards */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 18px;
-            margin-bottom: 25px;
+            gap: 16px;
         }
 
-        /* Model evaluation cards */
-        .model-metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 18px;
-            margin-bottom: 30px;
-        }
-
-        .card {
+        .kpi-card, .panel, .metric-card {
             background: white;
-            padding: 23px;
-            border-radius: 14px;
-            box-shadow: 0 5px 20px rgba(20, 40, 80, 0.06);
-            min-width: 0;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
         }
 
-        .kpi-label {
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 12px;
+        .kpi-card {
+            padding: 21px;
+            transition: transform .2s, box-shadow .2s;
         }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 13px 32px #26365a10;
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .kpi-label { color: #78839a; font-size: 12px; font-weight: 600; }
+
+        .kpi-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 17px;
+        }
+
+        .icon-blue { background: #edf0ff; color: #536dfe; }
+        .icon-red { background: #fff0f2; color: #ed647c; }
+        .icon-green { background: #e9faf3; color: #17a673; }
+        .icon-purple { background: #f1edff; color: #8667f5; }
 
         .kpi-value {
-            font-size: 30px;
-            font-weight: bold;
-            color: #173d7a;
-            margin: 8px 0;
-            overflow-wrap: anywhere;
+            font-family: "Manrope", sans-serif;
+            font-size: clamp(25px, 2.4vw, 34px);
+            font-weight: 800;
+            letter-spacing: -1.3px;
+            margin: 17px 0 9px;
         }
 
-        .metric-description {
-            color: #64748b;
-            font-size: 13px;
-            line-height: 1.5;
-            margin-bottom: 0;
+        .kpi-foot { font-size: 11px; color: #929bad; }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
         }
 
-        .model-metrics-grid h3 {
-            font-size: 16px;
-            margin: 0;
-            color: #334155;
+        .metric-card { padding: 16px; box-shadow: none; }
+        .metric-label { color: #7c879d; font-size: 11px; font-weight: 600; }
+
+        .metric-value {
+            font-family: "Manrope", sans-serif;
+            font-size: 23px;
+            font-weight: 800;
+            margin: 9px 0;
         }
+
+        .metric-track { height: 4px; background: #edf0f7; border-radius: 20px; overflow: hidden; }
+        .metric-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #536dfe, #9673ff); }
 
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 22px;
+            gap: 18px;
+            margin-top: 16px;
         }
 
-        .chart-card h3 {
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
+        .panel { padding: 22px; min-width: 0; }
+        .panel.wide { grid-column: 1 / -1; }
 
-        .chart-card p {
-            color: #64748b;
-            font-size: 13px;
-            line-height: 1.5;
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
             margin-bottom: 22px;
         }
 
-        .chart-container {
-            position: relative;
-            height: 320px;
+        .panel-title {
+            font-family: "Manrope", sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            margin: 0 0 6px;
+        }
+
+        .panel-subtitle { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+        .panel-tag {
+            background: #f0f2ff;
+            color: #5c6ff2;
+            border-radius: 7px;
+            padding: 6px 9px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .chart-wrap { height: 270px; position: relative; }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 16px;
         }
 
         .insight {
-            margin-top: 24px;
-            background: #e8f0ff;
-            border-left: 5px solid #2456a6;
-            padding: 20px;
-            border-radius: 8px;
-            line-height: 1.6;
+            padding: 19px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
         }
 
-        .insight p {
-            margin-bottom: 0;
+        .insight-icon {
+            width: 35px;
+            height: 35px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            background: #edf0ff;
+            color: var(--blue);
+            font-size: 16px;
+            margin-bottom: 13px;
         }
 
-        footer {
+        .insight h3 { font-size: 12px; margin: 0 0 7px; }
+        .insight p { color: #7e899f; font-size: 11px; line-height: 1.8; margin: 0; }
+
+        .footer {
             text-align: center;
-            padding: 25px;
-            color: #64748b;
-            font-size: 13px;
+            color: #9aa4b7;
+            font-size: 11px;
+            padding: 29px 10px 0;
         }
 
-        @media (max-width: 1000px) {
-            .model-metrics-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
+        @media (max-width: 1200px) {
+            .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .content { padding: 25px 23px; }
         }
 
         @media (max-width: 850px) {
-            .kpi-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .model-metrics-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
+            .sidebar { width: 76px; padding: 23px 10px; }
+            .brand { justify-content: center; padding: 0 0 32px; }
+            .brand-name, .nav-label, .nav-text, .model-status { display: none; }
+            .nav-link { justify-content: center; padding: 13px 8px; }
+            .nav-icon { font-size: 19px; }
+            .topbar { padding: 17px 22px; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .panel.wide { grid-column: auto; }
+            .insights-grid { grid-template-columns: 1fr; }
         }
 
-        @media (max-width: 480px) {
-            .kpi-grid,
-            .model-metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .kpi-value {
-                font-size: 26px;
-            }
-
-            .card {
-                padding: 18px;
-            }
+        @media (max-width: 560px) {
+            .sidebar { width: 58px; padding: 18px 6px; }
+            .brand-mark { width: 35px; height: 35px; }
+            .topbar { padding: 15px; align-items: flex-start; }
+            .page-title { font-size: 19px; }
+            .live-pill, .avatar { display: none; }
+            .back-button { padding: 9px 10px; font-size: 11px; }
+            .content { padding: 22px 14px; }
+            .welcome-row { align-items: flex-start; flex-direction: column; }
+            .kpi-grid { gap: 10px; }
+            .kpi-card { padding: 15px; }
+            .kpi-icon { width: 31px; height: 31px; }
+            .kpi-value { font-size: 25px; }
+            .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .panel { padding: 17px; }
+            .chart-wrap { height: 235px; }
         }
     </style>
 </head>
 
 <body>
-
-<header>
-    <h1>ChurnIQ</h1>
-    <p>Customer Retention Intelligence Platform</p>
-</header>
-
-<main class="container">
-
-    <div class="top-row">
-        <div>
-            <h2>Analytics Dashboard</h2>
-            <p>Explore customer retention patterns and churn trends.</p>
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">C</div>
+            <div class="brand-name">Churn<span>IQ</span></div>
         </div>
 
-        <a class="back-link" href="/">← Back to Prediction</a>
-    </div>
+        <div class="nav-label">WORKSPACE</div>
+        <nav>
+            <a class="nav-link active" href="{{ url_for('analytics_dashboard') }}">
+                <span class="nav-icon">▦</span><span class="nav-text">Overview</span>
+            </a>
+            <a class="nav-link" href="{{ url_for('home') }}">
+                <span class="nav-icon">⌕</span><span class="nav-text">Predict Churn</span>
+            </a>
+            <a class="nav-link" href="#model-performance">
+                <span class="nav-icon">◈</span><span class="nav-text">Model Performance</span>
+            </a>
+            <a class="nav-link" href="#churn-analysis">
+                <span class="nav-icon">⌁</span><span class="nav-text">Churn Analytics</span>
+            </a>
+        </nav>
 
-    <!-- Customer summary cards -->
-    <section class="kpi-grid">
-
-        <div class="card">
-            <div class="kpi-label">Total Customers</div>
-            <div class="kpi-value">{{ "{:,}".format(total_customers) }}</div>
-        </div>
-
-        <div class="card">
-            <div class="kpi-label">Churned Customers</div>
-            <div class="kpi-value">{{ "{:,}".format(churned) }}</div>
-        </div>
-
-        <div class="card">
-            <div class="kpi-label">Retained Customers</div>
-            <div class="kpi-value">{{ "{:,}".format(retained) }}</div>
-        </div>
-
-        <div class="card">
-            <div class="kpi-label">Overall Churn Rate</div>
-            <div class="kpi-value">{{ churn_rate }}%</div>
-        </div>
-
-    </section>
-
-    <!-- Model evaluation cards -->
-    <section class="model-metrics-grid">
-
-        <div class="card">
-            <h3>Model Accuracy</h3>
-            <div class="kpi-value">
-                {{ (model_metrics.accuracy * 100) | round(2) }}%
-            </div>
-            <p class="metric-description">
-                Overall prediction correctness.
-            </p>
-        </div>
-
-        <div class="card">
-            <h3>Precision</h3>
-            <div class="kpi-value">
-                {{ (model_metrics.precision * 100) | round(2) }}%
-            </div>
-            <p class="metric-description">
-                How often predicted churners actually churned.
-            </p>
-        </div>
-
-        <div class="card">
-            <h3>Recall</h3>
-            <div class="kpi-value">
-                {{ (model_metrics.recall * 100) | round(2) }}%
-            </div>
-            <p class="metric-description">
-                Actual churners identified by the model.
-            </p>
-        </div>
-
-        <div class="card">
-            <h3>F1-Score</h3>
-            <div class="kpi-value">
-                {{ (model_metrics.f1_score * 100) | round(2) }}%
-            </div>
-            <p class="metric-description">
-                Balance between precision and recall.
-            </p>
-        </div>
-
-        <div class="card">
-            <h3>ROC-AUC</h3>
-            <div class="kpi-value">
-                {{ (model_metrics.roc_auc * 100) | round(2) }}%
-            </div>
-            <p class="metric-description">
-                Ability to distinguish churners from non-churners.
-            </p>
-        </div>
-
-    </section>
-
-    <!-- Existing three charts -->
-    <section class="charts-grid">
-
-        <div class="card chart-card">
-            <h3>Churn by Contract Type</h3>
-            <p>
-                Percentage of customers who churn within each contract group.
-            </p>
-
-            <div class="chart-container">
-                <canvas id="contractChart"></canvas>
+        <div class="sidebar-bottom">
+            <div class="nav-label">SYSTEM</div>
+            <a class="nav-link" href="#about-model">
+                <span class="nav-icon">ⓘ</span><span class="nav-text">About ChurnIQ</span>
+            </a>
+            <div class="model-status">
+                <div class="status-heading"><span class="status-dot"></span> Model available</div>
+                <div class="status-description">Churn prediction engine is loaded and ready to analyse customer data.</div>
             </div>
         </div>
+    </aside>
 
-        <div class="card chart-card">
-            <h3>Churn by Customer Tenure</h3>
-            <p>
-                How churn rates vary with the length of the customer relationship.
-            </p>
-
-            <div class="chart-container">
-                <canvas id="tenureChart"></canvas>
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <div class="breadcrumb">Workspace / <span>Overview</span></div>
+                <h1 class="page-title">Customer Intelligence</h1>
             </div>
-        </div>
 
-        <div class="card chart-card">
-            <h3>Top Churn Factors</h3>
-            <p>
-                Features with the largest model coefficients.
-                Positive values are associated with higher churn odds;
-                negative values with lower odds.
-            </p>
-
-            <div class="chart-container">
-                <canvas id="featureChart"></canvas>
+            <div class="topbar-right">
+                <a class="back-button" href="{{ url_for('home') }}">
+                    ← Back to Customer Form
+                </a>
+                <div class="live-pill"><span class="status-dot"></span> Analytics ready</div>
+                <div class="avatar">C</div>
             </div>
+        </header>
+
+        <div class="content">
+            <section class="welcome-row">
+                <div>
+                    <div class="eyebrow">CUSTOMER RETENTION PLATFORM</div>
+                    <h2 class="welcome-title">Know your customers. Keep them longer.</h2>
+                    <p class="welcome-subtitle">A clear view of customer retention, churn patterns and model performance.</p>
+                </div>
+                <div class="date-label">✦ &nbsp; Model-powered insights</div>
+            </section>
+
+            <div class="section-heading">
+                <h2>Business overview</h2>
+                <span class="section-note">Based on the loaded Telco dataset</span>
+            </div>
+
+            <section class="kpi-grid">
+                <article class="kpi-card">
+                    <div class="kpi-top">
+                        <span class="kpi-label">Total customers</span>
+                        <span class="kpi-icon icon-blue">♙</span>
+                    </div>
+                    <div class="kpi-value">{{ "{:,}".format(total_customers) }}</div>
+                    <div class="kpi-foot">Customers in the analysed dataset</div>
+                </article>
+
+                <article class="kpi-card">
+                    <div class="kpi-top">
+                        <span class="kpi-label">Churned customers</span>
+                        <span class="kpi-icon icon-red">↗</span>
+                    </div>
+                    <div class="kpi-value">{{ "{:,}".format(churned) }}</div>
+                    <div class="kpi-foot">Customers marked as churned</div>
+                </article>
+
+                <article class="kpi-card">
+                    <div class="kpi-top">
+                        <span class="kpi-label">Retained customers</span>
+                        <span class="kpi-icon icon-green">✓</span>
+                    </div>
+                    <div class="kpi-value">{{ "{:,}".format(retained) }}</div>
+                    <div class="kpi-foot">Customers who stayed</div>
+                </article>
+
+                <article class="kpi-card">
+                    <div class="kpi-top">
+                        <span class="kpi-label">Churn rate</span>
+                        <span class="kpi-icon icon-purple">◉</span>
+                    </div>
+                    <div class="kpi-value">{{ "%.1f"|format(churn_rate) }}%</div>
+                    <div class="kpi-foot">Share of customers who churned</div>
+                </article>
+            </section>
+
+            <section id="model-performance">
+                <div class="section-heading">
+                    <h2>Model performance</h2>
+                    <span class="section-note">Held-out test-set evaluation</span>
+                </div>
+
+                <div class="metric-grid">
+                    {% set metric_items = [
+                        ('Accuracy', 'accuracy'),
+                        ('Precision', 'precision'),
+                        ('Recall', 'recall'),
+                        ('F1 score', 'f1_score'),
+                        ('ROC-AUC', 'roc_auc')
+                    ] %}
+                    {% for label, key in metric_items %}
+                    {% set value = model_metrics.get(key, 0) %}
+                    <article class="metric-card">
+                        <div class="metric-label">{{ label }}</div>
+                        <div class="metric-value">{{ "%.1f"|format(value * 100) }}%</div>
+                        <div class="metric-track">
+                            <div class="metric-fill" style="width: {{ [value * 100, 100]|min }}%"></div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section id="churn-analysis">
+                <div class="section-heading">
+                    <h2>Explore churn patterns</h2>
+                    <span class="section-note">Interactive visual analytics</span>
+                </div>
+
+                <div class="charts-grid">
+                    <article class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h3 class="panel-title">Churn by contract type</h3>
+                                <div class="panel-subtitle">Percentage of customers who churned within each contract group.</div>
+                            </div>
+                            <span class="panel-tag">CONTRACT</span>
+                        </div>
+                        <div class="chart-wrap"><canvas id="contractChart"></canvas></div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h3 class="panel-title">Churn across tenure</h3>
+                                <div class="panel-subtitle">Percentage of customers who churned in each tenure group.</div>
+                            </div>
+                            <span class="panel-tag">TENURE</span>
+                        </div>
+                        <div class="chart-wrap"><canvas id="tenureChart"></canvas></div>
+                    </article>
+
+                    <article class="panel wide">
+                        <div class="panel-header">
+                            <div>
+                                <h3 class="panel-title">Factors influencing churn predictions</h3>
+                                <div class="panel-subtitle">Logistic regression coefficients show the direction of each model effect.</div>
+                            </div>
+                            <span class="panel-tag">MODEL EXPLAINABILITY</span>
+                        </div>
+                        <div class="chart-wrap"><canvas id="factorsChart"></canvas></div>
+                    </article>
+                </div>
+            </section>
+
+            <section id="about-model">
+                <div class="section-heading">
+                    <h2>Insights to keep in mind</h2>
+                    <span class="section-note">Interpretation guide</span>
+                </div>
+
+                <div class="insights-grid">
+                    <article class="insight">
+                        <div class="insight-icon">⌁</div>
+                        <h3>Look beyond the overall rate</h3>
+                        <p>Compare churn patterns by contract and tenure to understand which customer groups may need closer attention.</p>
+                    </article>
+
+                    <article class="insight">
+                        <div class="insight-icon">◎</div>
+                        <h3>Use risk as a starting point</h3>
+                        <p>A predicted probability is an estimate, not a guarantee. Review customer context before deciding on a retention action.</p>
+                    </article>
+
+                    <article class="insight">
+                        <div class="insight-icon">✧</div>
+                        <h3>Validate before business use</h3>
+                        <p>This model uses public telecom data. Evaluate it on representative company data before relying on it for real decisions.</p>
+                    </article>
+                </div>
+            </section>
+
+            <footer class="footer">
+                ChurnIQ · Customer Retention Intelligence · Machine learning decision support
+            </footer>
         </div>
-
-    </section>
-
-    <!-- Business insight -->
-    <div class="insight">
-        <strong>Business Insight</strong>
-        <p>
-            Customers on month-to-month contracts and customers with shorter
-            tenures may need additional retention attention. Businesses can
-            investigate these groups and test suitable retention offers.
-            These patterns show associations, not proof of causation.
-        </p>
-    </div>
-
-</main>
-
-<footer>
-    ChurnIQ | Customer Retention Intelligence Platform
-</footer>
+    </main>
+</div>
 
 <script>
-    // Contract chart data
+    Chart.defaults.font.family = "'DM Sans', sans-serif";
+    Chart.defaults.color = "#8993a7";
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.boxWidth = 8;
+
     const contractLabels = {{ contract_labels | tojson }};
-    const contractRates = {{ contract_rates | tojson }};
-
-    // Tenure chart data
+    const contractValues = {{ contract_values | tojson }};
     const tenureLabels = {{ tenure_labels | tojson }};
-    const tenureRates = {{ tenure_rates | tojson }};
+    const tenureValues = {{ tenure_values | tojson }};
+    const factorLabels = {{ factor_labels | tojson }};
+    const factorValues = {{ factor_values | tojson }};
 
-    // Chart 1: Churn by contract type
+    const gridColor = "#edf0f6";
+
     new Chart(document.getElementById("contractChart"), {
         type: "bar",
         data: {
             labels: contractLabels,
             datasets: [{
-                label: "Churn Rate (%)",
-                data: contractRates,
-                backgroundColor: ["#5279d5", "#4eaa94", "#e9a23b"],
+                label: "Churn rate",
+                data: contractValues,
+                backgroundColor: ["#627cff", "#8667f5", "#a99bff"],
                 borderRadius: 7,
-                maxBarThickness: 75
+                maxBarThickness: 48
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
             scales: {
+                x: { grid: { display: false }, border: { display: false } },
                 y: {
                     beginAtZero: true,
-                    max: 100,
-                    title: {
-                        display: true,
-                        text: "Churn Rate (%)"
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.parsed.y + "% churn";
-                        }
-                    }
+                    grid: { color: gridColor },
+                    border: { display: false },
+                    ticks: { callback: value => value + "%" }
                 }
             }
         }
     });
 
-    // Chart 2: Churn by customer tenure
     new Chart(document.getElementById("tenureChart"), {
         type: "line",
         data: {
             labels: tenureLabels,
             datasets: [{
-                label: "Churn Rate (%)",
-                data: tenureRates,
-                borderColor: "#2456a6",
-                backgroundColor: "rgba(36, 86, 166, 0.12)",
-                fill: true,
-                tension: 0.3,
+                label: "Churn rate",
+                data: tenureValues,
+                borderColor: "#6e70f6",
+                backgroundColor: "rgba(110,112,246,0.12)",
+                pointBackgroundColor: "#fff",
+                pointBorderColor: "#6e70f6",
+                pointBorderWidth: 2,
                 pointRadius: 5,
-                pointHoverRadius: 8
+                fill: true,
+                tension: 0.35
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
             scales: {
+                x: { grid: { display: false }, border: { display: false } },
                 y: {
                     beginAtZero: true,
-                    max: 100,
-                    title: {
-                        display: true,
-                        text: "Churn Rate (%)"
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.parsed.y + "% churn";
-                        }
-                    }
+                    grid: { color: gridColor },
+                    border: { display: false },
+                    ticks: { callback: value => value + "%" }
                 }
             }
         }
     });
 
-    // Feature coefficient chart data
-    const featureLabels = {{ feature_labels | tojson }};
-    const featureValues = {{ feature_values | tojson }};
-
-    // Chart 3: Top churn factors
-    new Chart(document.getElementById("featureChart"), {
+    new Chart(document.getElementById("factorsChart"), {
         type: "bar",
         data: {
-            labels: featureLabels,
+            labels: factorLabels,
             datasets: [{
-                label: "Model Coefficient",
-                data: featureValues,
-                backgroundColor: featureValues.map(
-                    value => value >= 0 ? "#e9a23b" : "#5279d5"
-                ),
-                borderRadius: 5
+                label: "Model coefficient",
+                data: factorValues,
+                backgroundColor: factorValues.map(v => v >= 0 ? "#ed8197" : "#6684ff"),
+                borderRadius: 5,
+                maxBarThickness: 24
             }]
         },
         options: {
             indexAxis: "y",
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: "Model Coefficient"
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: context => "Coefficient: " + Number(context.raw).toFixed(3)
                     }
                 }
             },
-            plugins: {
-                legend: {
-                    display: false
-                }
+            scales: {
+                x: { grid: { color: gridColor }, border: { display: false } },
+                y: { grid: { display: false }, border: { display: false } }
             }
         }
     });
 </script>
-
 </body>
 </html>

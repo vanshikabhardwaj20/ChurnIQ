@@ -81,18 +81,17 @@ def predict():
 
         for field in ("MonthlyCharges", "TotalCharges"):
             value = customer[field]
-
             if not math.isfinite(value) or value < 0:
                 raise ValueError(f"Invalid value for {field}")
 
-        # 4. Prepare customer data for the model
+        # 4. Prepare customer data
         customer_df = pd.DataFrame([customer])
 
         # 5. Predict churn probability
         churn_probability = model.predict_proba(customer_df)[0][1]
         churn_percent = round(churn_probability * 100, 2)
 
-        # 6. Assign a risk category
+        # 6. Assign risk category
         if churn_probability >= 0.70:
             risk = "High"
         elif churn_probability >= 0.40:
@@ -128,7 +127,6 @@ def predict():
                 "Monitor customer satisfaction and review service usage."
             )
 
-        # 8. Display the prediction
         prediction = (
             "Likely to Churn"
             if churn_probability >= 0.50
@@ -156,7 +154,7 @@ def predict():
 
 @app.route("/dashboard")
 def analytics_dashboard():
-    # 1. Load and clean the dataset
+    # 1. Load and clean dataset
     df = pd.read_csv("data/Telco-Customer-Churn.csv")
 
     df["TotalCharges"] = pd.to_numeric(
@@ -175,13 +173,13 @@ def analytics_dashboard():
         else 0
     )
 
-    # 3. Calculate churn rate by contract type
+    # 3. Churn rate by contract type
     contract_churn = (
         df.groupby("Contract")["Churn"]
         .apply(lambda x: round((x == "Yes").mean() * 100, 2))
     )
 
-    # 4. Calculate churn rate by customer tenure
+    # 4. Churn rate by tenure group
     df["TenureGroup"] = pd.cut(
         df["tenure"],
         bins=[-1, 12, 24, 48, 72],
@@ -198,13 +196,16 @@ def analytics_dashboard():
         .apply(lambda x: round((x == "Yes").mean() * 100, 2))
     )
 
-    # 5. Load feature importance results
-    importance_df = pd.read_csv("models/feature_importance.csv")
+    # 5. Load and prepare feature importance
+    importance_path = os.path.join(
+        "models", "feature_importance.csv"
+    )
+    importance_df = pd.read_csv(importance_path)
 
-    # Sort by absolute coefficient magnitude to show the strongest effects
     importance_df["AbsoluteCoefficient"] = (
         importance_df["Coefficient"].abs()
     )
+
     top_features = (
         importance_df.sort_values(
             "AbsoluteCoefficient", ascending=False
@@ -213,7 +214,6 @@ def analytics_dashboard():
         .copy()
     )
 
-    # Make feature names easier to read
     top_features["Feature"] = (
         top_features["Feature"]
         .str.replace("categorical__", "", regex=False)
@@ -225,24 +225,38 @@ def analytics_dashboard():
     feature_values = top_features["Coefficient"].round(3).tolist()
 
     # 6. Load model evaluation metrics
-    metrics_path = os.path.join("models", "model_metrics.json")
+    metrics_path = os.path.join(
+        "models", "model_metrics.json"
+    )
 
     with open(metrics_path, "r", encoding="utf-8") as file:
         model_metrics = json.load(file)
 
-    # 7. Render the dashboard
+    # 7. Pass chart data using the names expected by dashboard.html
     return render_template(
         "dashboard.html",
         total_customers=total_customers,
         churned=churned,
         retained=retained,
         churn_rate=churn_rate,
+
+        # Contract chart
         contract_labels=contract_churn.index.tolist(),
+        contract_values=contract_churn.tolist(),
         contract_rates=contract_churn.tolist(),
+
+        # Tenure chart
         tenure_labels=[str(x) for x in tenure_churn.index],
+        tenure_values=tenure_churn.tolist(),
         tenure_rates=tenure_churn.tolist(),
+
+        # Churn factors chart
         feature_labels=feature_labels,
         feature_values=feature_values,
+        factor_labels=feature_labels,
+        factor_values=feature_values,
+
+        # Model evaluation metrics
         model_metrics=model_metrics
     )
 
