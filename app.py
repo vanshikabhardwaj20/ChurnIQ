@@ -22,12 +22,17 @@ model = joblib.load(MODEL_PATH)
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("home.html")
 
 
-@app.route("/predict", methods=["POST"])
+@app.route("/predict", methods=["GET", "POST"])
 def predict():
+    if request.method == "GET":
+        return render_template("index.html")
+
     try:
+
+
         # 1. Read customer information from the form
         customer = {
             "gender": request.form["gender"].strip(),
