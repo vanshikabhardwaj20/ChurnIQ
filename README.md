@@ -1,38 +1,49 @@
 # ChurnIQ — Customer Retention Intelligence Platform
 
-ChurnIQ is a machine-learning-based customer retention platform that predicts the likelihood of a telecom customer leaving a company. It helps businesses identify customers who may be at risk and understand factors associated with customer churn.
+ChurnIQ is a machine-learning-based customer retention platform that predicts the likelihood of telecom customer churn. It combines customer-level risk prediction, rule-based retention recommendations, and an analytics dashboard to help users explore churn patterns and evaluate model performance.
 
-## Features
+## Key Features
 
 - **Customer Churn Prediction:** Estimates the probability that a customer will leave.
-- **Risk Classification:** Categorizes customers into Low, Medium, or High risk.
-- **Personalized Recommendations:** Provides suggestions based on customer characteristics, such as contract type, tenure, and subscribed services.
-- **Analytics Dashboard:** Displays customer statistics, churn patterns, and important churn-related factors.
-- **Model Evaluation:** Reports accuracy, precision, recall, F1-score, and ROC-AUC.
-- **Input Validation:** Checks submitted customer information before generating predictions.
-- **Automated Testing:** Uses pytest to test key application routes and prediction functionality.
+- **Churn Risk Classification:** Groups customers into Low, Medium, or High risk categories.
+- **Personalized Retention Recommendations:** Generates rule-based suggestions using customer characteristics such as contract type, tenure, technical support, and online security subscriptions.
+- **Interactive Analytics Dashboard:** Presents customer statistics, churn patterns, model metrics, and churn-related factors.
+- **Model Comparison:** Compares Logistic Regression and Random Forest using multiple evaluation metrics.
+- **Model Evaluation:** Reports accuracy, precision, recall, F1-score, ROC-AUC, and other performance measures.
+- **Input Validation:** Validates customer information submitted through the prediction form.
+- **Automated Testing:** Uses pytest to test application routes and prediction functionality.
 
 ## Technology Stack
 
-- Python
-- Flask
-- Pandas and NumPy
-- Scikit-learn
-- Matplotlib and Seaborn
-- Joblib
-- HTML, CSS, and JavaScript
-- Chart.js
-- Pytest
+| Category | Technologies |
+|---|---|
+| Programming Language | Python |
+| Web Framework | Flask |
+| Data Processing | Pandas, NumPy |
+| Machine Learning | Scikit-learn |
+| Model Persistence | Joblib |
+| Visualization and Analysis | Matplotlib, Seaborn |
+| Frontend | HTML, CSS, JavaScript |
+| Interactive Charts | Chart.js |
+| Testing | Pytest |
 
-## Machine Learning Approach
+## How It Works
 
-ChurnIQ uses a Scikit-learn machine-learning pipeline with preprocessing and Logistic Regression.
+1. **Data Preparation:** Cleans the customer dataset and prepares the target variable for model training.
+2. **Preprocessing:** Uses a Scikit-learn pipeline to apply preprocessing to the input features.
+3. **Model Training:** Trains a Logistic Regression classifier with class weighting to address the imbalance between churn and non-churn customers.
+4. **Prediction:** Estimates churn probability for submitted customer information.
+5. **Risk Assessment:** Assigns a risk category using predefined probability thresholds.
+6. **Retention Recommendations:** Applies predefined business rules to suggest possible retention actions.
+7. **Analytics:** Displays customer statistics, churn patterns, model evaluation results, and model comparisons.
 
-The model estimates churn probability from customer information, including tenure, contract type, monthly charges, and subscribed services.
+The application is designed as a decision-support prototype. Predictions identify potential churn risk; they do not establish that a customer will definitely leave.
 
-The project also compares Logistic Regression with Random Forest to examine differences in their evaluation metrics.
+## Model Performance
 
-### Evaluation Results
+The current production model is Logistic Regression.
+
+### Logistic Regression — Evaluation Results
 
 | Metric | Result |
 |---|---:|
@@ -42,18 +53,47 @@ The project also compares Logistic Regression with Random Forest to examine diff
 | F1-score | 60.69% |
 | ROC-AUC | 83.51% |
 
-These results are from the project's current evaluation run. Recall measures how many actual churners the model identifies, while precision measures how many customers flagged as churners actually churned in the evaluation data.
+These results come from the project's current evaluation run.
+
+**Interpreting the results:**
+- **Accuracy:** The proportion of all predictions that were correct.
+- **Precision:** Of the customers predicted to churn, the proportion who actually churned in the evaluation data.
+- **Recall:** Of the customers who actually churned, the proportion identified by the model.
+- **F1-score:** The harmonic mean of precision and recall.
+- **ROC-AUC:** Measures how well the model distinguishes between churn and non-churn customers across classification thresholds.
+
+Recall is particularly relevant to churn detection because missing customers who are about to leave may reduce the opportunity for retention efforts. However, precision also matters because incorrectly flagging customers can lead to unnecessary interventions.
+
+### Model Comparison
+
+The project also evaluates Random Forest on the same train/test split.
+
+| Metric | Logistic Regression | Random Forest |
+|---|---:|---:|
+| Accuracy | 72.57% | 76.76% |
+| Precision | 49.01% | 55.35% |
+| Recall | 79.68% | 64.97% |
+| F1-score | 60.69% | 59.78% |
+| ROC-AUC | 83.51% | 81.46% |
+| Specificity | 69.99% | 81.03% |
+
+Logistic Regression achieves higher recall and ROC-AUC in this evaluation, while Random Forest achieves higher accuracy, precision, and specificity. Logistic Regression remains the production model because the current project emphasizes identifying a larger proportion of actual churners.
+
+These metrics describe performance on the evaluation split; they do not guarantee similar performance on unseen real-world populations.
 
 ## Dataset
 
-The project uses the IBM Telco Customer Churn dataset.
+This project uses the IBM Telco Customer Churn dataset.
 
-- Original dataset: 7,043 customer records
-- Records remaining after cleaning: 7,032
-- Records with missing `TotalCharges` values removed: 11
-- Target variable: `Churn`
+- **Original records:** 7,043
+- **Records after cleaning:** 7,032
+- **Records removed:** 11 rows with missing `TotalCharges` values
+- **Target variable:** `Churn`
+- **Prediction objective:** Estimate whether a customer will churn.
 
-The dataset is used for experimentation and evaluation. Performance on other companies' customers may differ and would require appropriate data preparation, validation, and potentially model retraining.
+The `customerID` column is excluded from model training because it is an identifier rather than a meaningful customer-behaviour feature.
+
+The dataset is used for experimentation and evaluation. Applying the model to another company's customers would require appropriate data mapping, validation, and potentially retraining.
 
 ## Project Structure
 
@@ -64,7 +104,9 @@ CHURN IQ/
 ├── models/
 │   ├── churn_model.joblib
 │   ├── feature_importance.csv
-│   └── model_metrics.json
+│   ├── model_metrics.json
+│   ├── model_comparison.csv
+│   └── model_comparison.png
 ├── notebooks/
 ├── static/
 ├── templates/
@@ -78,19 +120,20 @@ CHURN IQ/
 ├── compare_models.py
 ├── dashboard.py
 ├── requirements.txt
+├── .gitignore
 └── README.md
 ```
+
+This structure describes the main project files; additional files may be present in the repository.
 
 ## Installation and Setup
 
 ### 1. Clone the repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
-cd "CHURN IQ"
+git clone https://github.com/vanshikabhardwaj20/ChurnIQ.git
+cd ChurnIQ
 ```
-
-Replace `YOUR_GITHUB_REPOSITORY_URL` with your actual repository URL.
 
 ### 2. Create a virtual environment
 
@@ -116,40 +159,44 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Open the following address in your browser:
+Open the application in your browser:
 
-http://127.0.0.1:5000
+- **Customer Prediction:** http://127.0.0.1:5000/
+- **Analytics Dashboard:** http://127.0.0.1:5000/dashboard
 
-The analytics dashboard is available at:
+Keep the terminal running while using the application.
 
-http://127.0.0.1:5000/dashboard
+## Running Tests
 
-## Run Tests
-
-Run the automated test suite using:
+Run the automated test suite:
 
 ```bash
 python -m pytest -v
 ```
 
-The current test suite has five passing tests.
+The current test suite contains five tests covering page loading, dashboard loading, input validation, unknown routes, and valid customer predictions. All five tests passed in the latest reported run.
 
-## Important Limitations
+## Screenshots
 
-- Predictions indicate estimated risk, not certainty that a customer will leave.
-- Recommendations are suggestions; their effectiveness has not yet been established through a real-world intervention study.
-- The model was evaluated on a particular telecom dataset and may not generalize to other customer populations without further validation.
-- The project is a decision-support prototype, not a guarantee of customer retention.
+Screenshots of the prediction page and analytics dashboard will be added here to demonstrate the application's interface and functionality.
+
+## Limitations
+
+- Predictions represent estimated risk, not certainty.
+- Retention recommendations use predefined rules; they are not generated by a generative AI model.
+- The model was evaluated on a specific telecom dataset and may not generalize to other customer populations.
+- The effectiveness of retention recommendations has not been established through real-world controlled experiments.
+- This project is a decision-support prototype, not a guarantee of customer retention.
 
 ## Future Improvements
 
-- Add model calibration and threshold tuning.
-- Improve explainability with customer-level feature explanations.
-- Add historical churn trend analysis.
-- Evaluate recommendations through controlled experiments.
+- Calibrate predicted probabilities and tune classification thresholds.
+- Add customer-level feature explanations.
+- Expand historical churn trend analysis.
+- Evaluate retention recommendations through controlled experiments.
 - Support uploading new customer datasets with validation.
-- Improve deployment, monitoring, and model-drift detection.
+- Add deployment monitoring and model-drift detection.
 
 ## Author
 
-Developed as a machine-learning and data analytics project focused on customer churn prediction and retention insights.
+Developed as a machine-learning and data analytics project focused on customer churn prediction, model evaluation, and retention insights.
