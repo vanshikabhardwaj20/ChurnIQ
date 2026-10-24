@@ -2,6 +2,10 @@
 
 ChurnIQ is a machine-learning-based customer retention platform that predicts the likelihood of telecom customer churn. It combines customer-level risk prediction, rule-based retention recommendations, and an analytics dashboard to help users explore churn patterns and evaluate model performance.
 
+**Live Demo:** https://churniq-mn9u.onrender.com
+
+**GitHub Repository:** https://github.com/vanshikabhardwaj20/ChurnIQ
+
 ## Key Features
 
 - **Customer Churn Prediction:** Estimates the probability that a customer will leave.
@@ -12,6 +16,20 @@ ChurnIQ is a machine-learning-based customer retention platform that predicts th
 - **Model Evaluation:** Reports accuracy, precision, recall, F1-score, ROC-AUC, and other performance measures.
 - **Input Validation:** Validates customer information submitted through the prediction form.
 - **Automated Testing:** Uses pytest to test application routes and prediction functionality.
+
+## Screenshots
+
+### Homepage
+
+![ChurnIQ Homepage](screenshots/homepage.png)
+
+### Customer Churn Prediction
+
+![ChurnIQ Prediction Result](screenshots/prediction.png)
+
+### Analytics Dashboard
+
+![ChurnIQ Analytics Dashboard](screenshots/dashboard.png)
 
 ## Technology Stack
 
@@ -56,6 +74,7 @@ The current production model is Logistic Regression.
 These results come from the project's current evaluation run.
 
 **Interpreting the results:**
+
 - **Accuracy:** The proportion of all predictions that were correct.
 - **Precision:** Of the customers predicted to churn, the proportion who actually churned in the evaluation data.
 - **Recall:** Of the customers who actually churned, the proportion identified by the model.
@@ -98,7 +117,7 @@ The dataset is used for experimentation and evaluation. Applying the model to an
 ## Project Structure
 
 ```text
-CHURN IQ/
+ChurnIQ/
 ├── data/
 │   └── Telco-Customer-Churn.csv
 ├── models/
@@ -110,8 +129,13 @@ CHURN IQ/
 ├── notebooks/
 ├── static/
 ├── templates/
+│   ├── home.html
 │   ├── index.html
 │   └── dashboard.html
+├── screenshots/
+│   ├── homepage.png
+│   ├── prediction.png
+│   └── dashboard.png
 ├── tests/
 │   └── test_app.py
 ├── app.py
@@ -161,7 +185,8 @@ python app.py
 
 Open the application in your browser:
 
-- **Customer Prediction:** http://127.0.0.1:5000/
+- **Homepage:** http://127.0.0.1:5000/
+- **Customer Prediction:** http://127.0.0.1:5000/predict
 - **Analytics Dashboard:** http://127.0.0.1:5000/dashboard
 
 Keep the terminal running while using the application.
@@ -175,10 +200,6 @@ python -m pytest -v
 ```
 
 The current test suite contains five tests covering page loading, dashboard loading, input validation, unknown routes, and valid customer predictions. All five tests passed in the latest reported run.
-
-## Screenshots
-
-Screenshots of the prediction page and analytics dashboard will be added here to demonstrate the application's interface and functionality.
 
 ## Limitations
 
